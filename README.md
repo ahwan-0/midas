@@ -1,6 +1,6 @@
 ## Midas Core
 
-High throughput financial transaction processing microservice built with Spring Boot,Apache Kafka,andSpring Data JPA.
+High throughput financial transaction processing microservice built with Spring Boot,Apache Kafka,and Spring Data JPA.
 
 
 ## Overview
