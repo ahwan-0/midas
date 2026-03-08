@@ -1,34 +1,26 @@
 ## Midas Core
 
-High throughput financial transaction processing microservice built with Spring Boot, Apache Kafka, and Spring Data JPA.
+High throughput financial transaction processing microservice built with Spring Boot,Apache Kafka,andSpring Data JPA.
 
 
 ## Overview
 
 Midas Core is the central service responsible for receiving, validating, and recording financial transactions at scale. It integrates three external infrastructure components that are Apache Kafka for asynchronous ingestion, an H2 relational database for persistence, and a dedicated Incentive API for real time reward computation and exposes processed account data via a REST endpoint.
 
-Kafka Topic (trader-updates)
-         │
-         ▼
- TransactionListener      →   deserializes incoming Transaction events
-         │
-         ▼
- DatabaseConduit          →   validates sender, recipient, and balance
-         │
-         ▼
- IncentiveService         →   POSTs to external Incentive API (:8080)
-         │
-         ▼
- BalanceController        →   exposes GET /balance on port 33400
 
 
 ## Tech Stack
 
 Runtime : Java (version 17)
+
 Framework  : Springboot (version 3.2.5)
+
 Message Quque : Apache Kafka (version 3.1.4)
+
 Persistence : Spring Data JPA + H2 (version 2.2.224)
+
 Build Tool : Maven  (3.x)
+
 Testing : Testcontainers + EmbeddedKafka1.19.1
 
 
@@ -71,7 +63,7 @@ Windows: Use .\mvnw.cmd instead of ./mvnw
 
 #### Configuration
 
-All runtime configuration lives in src/main/resources/application.yml.
+All runtime configuration lives in `src/main/resources/application.yml.`
 
 ``` yaml
 server:
