@@ -1,7 +1,7 @@
 import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
-from dash import Dash, dcc, html, Input, Output
+from dash import Dash, dcc, html
 import random
 
 # ── SYNTHETIC DATA ────────────────────────────────────────────────────────────
@@ -171,9 +171,9 @@ def fig_top_senders():
         textposition='outside',
         textfont=dict(size=9, color=TEXT_DIM),
     ))
+    
     fig.update_layout(**PLOT_LAYOUT, height=280,
-        margin=dict(t=20, r=60, b=40, l=70),
-        xaxis_tickprefix='$', xaxis_title='Total Sent')
+    xaxis_tickprefix='$', xaxis_title='Total Sent')
     return fig
 
 
@@ -193,7 +193,7 @@ def kpi_card(value, label, color=GOLD_BRIGHT):
     })
 
 
-def chart_card(title, subtitle, chart_id):
+def chart_card(title, subtitle, figure):
     return html.Div([
         html.Div(title.upper(), style={
             'fontSize': '0.65rem', 'letterSpacing': '0.2em',
@@ -203,7 +203,7 @@ def chart_card(title, subtitle, chart_id):
             'fontFamily': 'Crimson Pro, serif', 'fontSize': '0.9rem',
             'fontStyle': 'italic', 'color': TEXT_DIM, 'marginBottom': '0.5rem',
         }),
-        dcc.Graph(id=chart_id, config={'displayModeBar': False}),
+        dcc.Graph(figure=figure, config={'displayModeBar': False}),
     ], style={
         'background': SURFACE, 'border': f'1px solid {BORDER}',
         'padding': '1.2rem', 'flex': '1',
@@ -273,7 +273,7 @@ app.layout = html.Div(style={
             'fontWeight': '900', 'lineHeight': '0.9',
             'letterSpacing': '-0.02em', 'marginBottom': '1.5rem',
         }),
-        html.P('A complete implementation of the JPMorgan Chase Forage virtual internship — building a real-time transaction processing system from scratch.', style={
+        html.P('A complete implementation of the JPMorgan Chase Forage virtual internship  building a real-time transaction processing system from scratch.', style={
             'fontFamily': 'Crimson Pro, serif', 'fontSize': '1.2rem',
             'fontStyle': 'italic', 'color': TEXT_DIM,
             'maxWidth': '500px', 'lineHeight': '1.7', 'marginBottom': '2rem',
@@ -331,23 +331,45 @@ app.layout = html.Div(style={
 
         # Volume — full width
         html.Div([
-            chart_card('Transaction Volume Over Time', 'Messages processed per minute during simulation run', 'chart-volume'),
+            chart_card('Transaction Volume Over Time', 'Messages processed per minute during simulation run', fig_volume()),
         ], style={'display': 'flex', 'gap': '1.5rem', 'marginBottom': '1.5rem'}),
 
         # Balances + Histogram
         html.Div([
-            chart_card('User Final Balances', 'Balance after all transactions + incentives applied', 'chart-balances'),
-            chart_card('Transaction Amount Distribution', 'Histogram of transfer amounts across the session', 'chart-hist'),
+            chart_card('User Final Balances', 'Balance after all transactions + incentives applied', fig_balances()),
+            chart_card('Transaction Amount Distribution', 'Histogram of transfer amounts across the session', fig_hist()),
         ], style={'display': 'flex', 'gap': '1.5rem', 'marginBottom': '1.5rem'}),
 
         # Scatter + Pie + Top Senders
         html.Div([
-            chart_card('Incentive vs Transfer Amount', 'Correlation between transfer size and incentive paid', 'chart-scatter'),
-            chart_card('Transaction Status Breakdown', 'Valid vs rejected transactions', 'chart-pie'),
-            chart_card('Top Senders by Volume', 'Total amount sent per user', 'chart-senders'),
+            chart_card('Incentive vs Transfer Amount', 'Correlation between transfer size and incentive paid', fig_scatter()),
+            chart_card('Transaction Status Breakdown', 'Valid vs rejected transactions', fig_pie()),
+            chart_card('Top Senders by Volume', 'Total amount sent per user', fig_top_senders()),
         ], style={'display': 'flex', 'gap': '1.5rem'}),
 
     ], style={'padding': '5rem 8vw', 'borderBottom': f'1px solid {BORDER}'}),
+
+ # ── MIDAS EXTENDED CTA ────────────────────────────────────────────────
+html.Div([
+    html.Div('// NEXT LEVEL', style={'fontSize': '0.65rem', 'letterSpacing': '0.25em', 'color': GOLD, 'marginBottom': '0.75rem'}),
+    html.H2('This was just the beginning.', style={
+        'fontFamily': 'Playfair Display, serif',
+        'fontSize': 'clamp(2rem, 4vw, 3rem)', 'marginBottom': '0.75rem',
+    }),
+    html.P('Midas Extended takes this foundation and builds a production grade ML/Data Engineering system on top. Apache Kafka pipelines, PostgreSQL, Apache Superset dashboards, and a real-time fraud detection engine powered by XGBoost and Isolation Forest.', style={
+        'fontFamily': 'Crimson Pro, serif', 'fontSize': '1.05rem',
+        'fontStyle': 'italic', 'color': TEXT_DIM, 'maxWidth': '640px',
+        'lineHeight': '1.8', 'marginBottom': '2rem',
+    }),
+    html.A('Explore Midas Extended →', href='https://github.com/ahwan-0/midas-extended', target='_blank', style={
+        'display': 'inline-block', 'padding': '12px 28px',
+        'border': f'1px solid {GOLD}', 'color': GOLD,
+        'textDecoration': 'none', 'fontSize': '0.7rem',
+        'letterSpacing': '0.2em', 'textTransform': 'uppercase',
+        'transition': 'all 0.3s',
+    }),
+], style={'padding': '5rem 8vw', 'borderBottom': f'1px solid {BORDER}'}),
+
 
     # ── FOOTER ────────────────────────────────────────────────────────
     html.Div([
@@ -367,28 +389,7 @@ app.layout = html.Div(style={
 ])
 
 
-# ── CALLBACKS ─────────────────────────────────────────────────────────────────
-@app.callback(
-    Output('chart-volume',   'figure'),
-    Output('chart-balances', 'figure'),
-    Output('chart-hist',     'figure'),
-    Output('chart-scatter',  'figure'),
-    Output('chart-pie',      'figure'),
-    Output('chart-senders',  'figure'),
-    Input('chart-volume', 'id'),   # dummy trigger on load
-)
-def render_all(_):
-    return (
-        fig_volume(),
-        fig_balances(),
-        fig_hist(),
-        fig_scatter(),
-        fig_pie(),
-        fig_top_senders(),
-    )
-
 server = app.server
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
-
